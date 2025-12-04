@@ -209,6 +209,16 @@ export default function BadgeDemo() {
     });
 
     // 6. PARTICLE BURST
+    const burstBadges = gsap.utils.toArray('.burst-badge');
+
+    burstBadges.forEach((badge: any) => {
+      const randomX = gsap.utils.random(-300, 300);
+      const randomY = gsap.utils.random(-300, 300);
+      const randomRotation = gsap.utils.random(-720, 720);
+
+      gsap.set(badge, { x: randomX, y: randomY, rotation: randomRotation, scale: 0, opacity: 0 });
+    });
+
     const burstTimeline = gsap.timeline({
       scrollTrigger: {
         trigger: '#burst-section',
@@ -217,58 +227,66 @@ export default function BadgeDemo() {
     });
 
     burstTimeline
-      .from('.burst-badge', {
-        scale: 0,
-        opacity: 0,
-        x: () => gsap.utils.random(-300, 300),
-        y: () => gsap.utils.random(-300, 300),
-        rotation: () => gsap.utils.random(-720, 720),
+      .to('.burst-badge', {
+        opacity: 1,
+        scale: 1,
         duration: 1.2,
-        ease: 'power4.out'
+        ease: 'power4.out',
+        stagger: 0.05
       })
       .to('.burst-badge', {
         x: 0,
         y: 0,
         rotation: 0,
-        scale: 1,
         stagger: 0.05,
         duration: 0.8,
         ease: 'elastic.out(1, 0.5)'
-      });
+      }, '-=0.8');
 
     // 7. BREATHING/PULSE EFFECT
     const breathingBadges = gsap.utils.toArray('.breathing-badge');
 
-    breathingBadges.forEach((badge: any, index: number) => {
-      gsap.from(badge, {
-        scale: 0,
-        opacity: 0,
-        duration: 0.8,
-        delay: index * 0.05,
-        ease: 'back.out(1.7)',
-        scrollTrigger: {
-          trigger: '#breathing-section',
-          start: 'top 70%'
-        }
-      });
+    ScrollTrigger.create({
+      trigger: '#breathing-section',
+      start: 'top 70%',
+      onEnter: () => {
+        // Entrance animation
+        breathingBadges.forEach((badge: any, index: number) => {
+          gsap.fromTo(badge,
+            { scale: 0, opacity: 0 },
+            {
+              scale: 1,
+              opacity: 1,
+              duration: 0.8,
+              delay: index * 0.05,
+              ease: 'back.out(1.7)',
+              onComplete: () => {
+                // Start continuous breathing animation
+                gsap.to(badge, {
+                  scale: 1.1,
+                  duration: 1.5 + Math.random(),
+                  repeat: -1,
+                  yoyo: true,
+                  ease: 'sine.inOut',
+                  delay: Math.random() * 0.5
+                });
 
-      gsap.to(badge, {
-        scale: 1.1,
-        duration: 1.5 + Math.random(),
-        repeat: -1,
-        yoyo: true,
-        ease: 'sine.inOut',
-        delay: Math.random() * 2
-      });
-
-      gsap.to(badge, {
-        filter: 'brightness(1.3) drop-shadow(0 0 20px currentColor)',
-        duration: 2 + Math.random(),
-        repeat: -1,
-        yoyo: true,
-        ease: 'sine.inOut',
-        delay: Math.random() * 2
-      });
+                // Start glow pulse (using boxShadow instead of filter)
+                const color = (badge as HTMLElement).querySelector('i')?.style.color || '#fff';
+                gsap.to(badge, {
+                  boxShadow: `0 0 30px ${color}, 0 0 60px ${color}40`,
+                  duration: 2 + Math.random(),
+                  repeat: -1,
+                  yoyo: true,
+                  ease: 'sine.inOut',
+                  delay: Math.random() * 0.5
+                });
+              }
+            }
+          );
+        });
+      },
+      once: true
     });
   };
 
