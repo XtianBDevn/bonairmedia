@@ -7,10 +7,6 @@ export default function Home() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [formStatus, setFormStatus] = useState('');
   const threejsCanvasRef = useRef<HTMLCanvasElement>(null);
-  const formRef = useRef<HTMLDivElement>(null);
-  const envelopeRef = useRef<HTMLDivElement>(null);
-  const envelopeFlapRef = useRef<HTMLDivElement>(null);
-  const successMessageRef = useRef<HTMLDivElement>(null);
 
   const testimonials = [
     {
@@ -315,105 +311,19 @@ export default function Home() {
     return colorMap[color] || colorMap.amber;
   };
 
-  // Envelope animation for contact form
-  const animateEnvelope = () => {
-    const gsap = (window as any).gsap;
-    if (!gsap) return;
-
-    const tl = gsap.timeline({
-      onComplete: () => {
-        setFormStatus('success');
-
-        // Show success message
-        if (successMessageRef.current) {
-          gsap.fromTo(
-            successMessageRef.current,
-            { opacity: 0, scale: 0, y: 50 },
-            { opacity: 1, scale: 1, y: 0, duration: 0.8, ease: 'back.out(1.7)' }
-          );
-        }
-
-        // Reset after 3 seconds
-        setTimeout(() => {
-          if (envelopeRef.current && formRef.current) {
-            gsap.to([envelopeRef.current, successMessageRef.current], {
-              opacity: 0,
-              duration: 0.5,
-              onComplete: () => {
-                setFormStatus('');
-                if (formRef.current && envelopeRef.current) {
-                  gsap.set(formRef.current, { clearProps: 'all' });
-                  gsap.set(envelopeRef.current, { clearProps: 'all' });
-                  if (envelopeFlapRef.current) {
-                    gsap.set(envelopeFlapRef.current, { clearProps: 'all' });
-                  }
-                }
-              },
-            });
-          }
-        }, 3000);
-      },
-    });
-
-    // Step 1: Shrink form
-    tl.to(formRef.current, {
-      scale: 0.8,
-      duration: 0.5,
-      ease: 'power2.inOut',
-    });
-
-    // Step 2: Transform into envelope shape
-    tl.to(formRef.current, {
-      borderRadius: '4px',
-      duration: 0.3,
-    });
-
-    // Step 3: Show envelope
-    if (envelopeRef.current) {
-      tl.set(envelopeRef.current, { display: 'block' });
-      tl.fromTo(
-        envelopeRef.current,
-        { opacity: 0 },
-        { opacity: 1, duration: 0.3 }
-      );
-    }
-
-    // Step 4: Close envelope flap
-    if (envelopeFlapRef.current) {
-      tl.to(envelopeFlapRef.current, {
-        rotationX: 0,
-        duration: 0.6,
-        ease: 'power2.inOut',
-      });
-    }
-
-    // Step 5: Shake slightly (sealing animation)
-    tl.to(formRef.current, {
-      x: -5,
-      duration: 0.05,
-      yoyo: true,
-      repeat: 5,
-    });
-
-    // Step 6: Fly away!
-    tl.to(formRef.current, {
-      x: typeof window !== 'undefined' ? window.innerWidth + 200 : 2000,
-      y: typeof window !== 'undefined' ? -window.innerHeight - 200 : -2000,
-      rotation: 45,
-      scale: 0.3,
-      duration: 1.5,
-      ease: 'power2.in',
-    });
-  };
-
   const handleFormSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setFormStatus('sending');
 
     // Simulate form submission
     setTimeout(() => {
-      animateEnvelope();
-    }, 500);
+      setFormStatus('success');
+
+      // Reset after 3 seconds
+      setTimeout(() => {
+        setFormStatus('');
+      }, 3000);
+    }, 1000);
   };
 
   return (
@@ -923,7 +833,7 @@ export default function Home() {
         </div>
         <div className="absolute inset-0 bg-stone-950/70"></div>
 
-        <div className="relative z-10 max-w-6xl mx-auto px-6">
+        <div className="relative z-10 max-w-4xl mx-auto px-6">
           <div className="text-center mb-16">
             <span className="text-amber-500 uppercase tracking-widest text-sm font-medium">Get In Touch</span>
             <h2 className="bebas text-5xl md:text-7xl mt-4 mb-6">
@@ -932,200 +842,129 @@ export default function Home() {
             <p id="contactDesc" className="text-xl text-stone-400 max-w-2xl mx-auto"></p>
           </div>
 
-          {/* Contact Form - Full Width */}
-          <div className="envelope-container relative mb-16">
-            <div
-              ref={formRef}
-              id="contactForm"
-              className="contact-form-container opacity-0 transform translate-y-10"
-            >
-              <form className="space-y-8 relative z-10" onSubmit={handleFormSubmit} style={{ opacity: formStatus === 'sending' ? 0.5 : 1 }}>
-              <div className="grid md:grid-cols-2 gap-8">
+          {/* Contact Form */}
+          <div
+            id="contactForm"
+            className="opacity-0 transform translate-y-10 bg-stone-900/50 backdrop-blur-xl border border-stone-700 rounded-2xl p-8 md:p-12"
+          >
+            <form className="space-y-6" onSubmit={handleFormSubmit}>
+              <div className="grid md:grid-cols-2 gap-6">
                 <div className="form-group">
-                  <div className="gradient-border">
-                    <div className="relative">
-                      <i className="fas fa-user absolute left-4 top-1/2 transform -translate-y-1/2 text-amber-500 z-10"></i>
-                      <input
-                        type="text"
-                        className="form-input w-full pl-12 pr-4 py-4 rounded-lg text-stone-100"
-                        placeholder="John Smith"
-                        required
-                      />
-                    </div>
-                  </div>
-                  <label className="block text-amber-500 text-xs mt-2 ml-2 uppercase tracking-widest font-medium">Your Name</label>
+                  <label className="block text-stone-300 text-sm font-medium mb-2">Name *</label>
+                  <input
+                    type="text"
+                    className="w-full px-4 py-3 rounded-lg bg-stone-800/50 border border-stone-700 text-stone-100 placeholder-stone-500 focus:border-amber-500 focus:outline-none transition-colors"
+                    placeholder="John Smith"
+                    required
+                  />
                 </div>
 
                 <div className="form-group">
-                  <div className="gradient-border">
-                    <div className="relative">
-                      <i className="fas fa-envelope absolute left-4 top-1/2 transform -translate-y-1/2 text-pink-500 z-10"></i>
-                      <input
-                        type="email"
-                        className="form-input w-full pl-12 pr-4 py-4 rounded-lg text-stone-100"
-                        placeholder="john@business.com"
-                        required
-                      />
-                    </div>
-                  </div>
-                  <label className="block text-pink-500 text-xs mt-2 ml-2 uppercase tracking-widest font-medium">Email Address</label>
+                  <label className="block text-stone-300 text-sm font-medium mb-2">Email *</label>
+                  <input
+                    type="email"
+                    className="w-full px-4 py-3 rounded-lg bg-stone-800/50 border border-stone-700 text-stone-100 placeholder-stone-500 focus:border-pink-500 focus:outline-none transition-colors"
+                    placeholder="john@business.com"
+                    required
+                  />
                 </div>
 
                 <div className="form-group">
-                  <div className="gradient-border">
-                    <div className="relative">
-                      <i className="fas fa-phone absolute left-4 top-1/2 transform -translate-y-1/2 text-cyan-500 z-10"></i>
-                      <input
-                        type="tel"
-                        className="form-input w-full pl-12 pr-4 py-4 rounded-lg text-stone-100"
-                        placeholder="(804) 555-1234"
-                      />
-                    </div>
-                  </div>
-                  <label className="block text-cyan-500 text-xs mt-2 ml-2 uppercase tracking-widest font-medium">Phone Number</label>
+                  <label className="block text-stone-300 text-sm font-medium mb-2">Phone</label>
+                  <input
+                    type="tel"
+                    className="w-full px-4 py-3 rounded-lg bg-stone-800/50 border border-stone-700 text-stone-100 placeholder-stone-500 focus:border-cyan-500 focus:outline-none transition-colors"
+                    placeholder="(804) 555-1234"
+                  />
                 </div>
 
                 <div className="form-group">
-                  <div className="gradient-border">
-                    <div className="relative">
-                      <i className="fas fa-briefcase absolute left-4 top-1/2 transform -translate-y-1/2 text-violet-500 z-10"></i>
-                      <input
-                        type="text"
-                        className="form-input w-full pl-12 pr-4 py-4 rounded-lg text-stone-100"
-                        placeholder="Your Company"
-                      />
-                    </div>
-                  </div>
-                  <label className="block text-violet-500 text-xs mt-2 ml-2 uppercase tracking-widest font-medium">Company Name</label>
+                  <label className="block text-stone-300 text-sm font-medium mb-2">Company</label>
+                  <input
+                    type="text"
+                    className="w-full px-4 py-3 rounded-lg bg-stone-800/50 border border-stone-700 text-stone-100 placeholder-stone-500 focus:border-violet-500 focus:outline-none transition-colors"
+                    placeholder="Your Company"
+                  />
                 </div>
               </div>
 
               <div className="form-group">
-                <div className="gradient-border">
-                  <div className="relative">
-                    <i className="fas fa-comment-dots absolute left-4 top-6 text-purple-500 z-10"></i>
-                    <textarea
-                      className="form-input w-full pl-12 pr-4 py-4 rounded-lg text-stone-100 h-40 resize-none"
-                      placeholder="Tell us about your project..."
-                      required
-                    ></textarea>
-                  </div>
-                </div>
-                <label className="block text-purple-500 text-xs mt-2 ml-2 uppercase tracking-widest font-medium">Your Message</label>
+                <label className="block text-stone-300 text-sm font-medium mb-2">Message *</label>
+                <textarea
+                  className="w-full px-4 py-3 rounded-lg bg-stone-800/50 border border-stone-700 text-stone-100 placeholder-stone-500 focus:border-purple-500 focus:outline-none transition-colors h-32 resize-none"
+                  placeholder="Tell us about your project..."
+                  required
+                ></textarea>
               </div>
 
               <button
                 type="submit"
-                className="w-full py-5 bg-gradient-to-r from-amber-500 via-pink-500 to-purple-500 text-white font-bold rounded-xl hover:shadow-2xl hover:shadow-pink-500/50 transition-all duration-500 transform hover:scale-[1.03] hover:-translate-y-1 text-lg flex items-center justify-center gap-3 relative overflow-hidden group"
+                className="w-full py-4 bg-gradient-to-r from-amber-500 via-pink-500 to-purple-500 text-white font-bold rounded-lg hover:shadow-2xl hover:shadow-pink-500/50 transition-all duration-300 transform hover:scale-[1.02] text-lg"
+                disabled={formStatus === 'sending'}
               >
-                <span className="relative z-10">Launch Your Project</span>
-                <i className="fas fa-rocket relative z-10 group-hover:rotate-45 transition-transform duration-500"></i>
-                <div className="absolute inset-0 bg-gradient-to-r from-purple-500 via-pink-500 to-amber-500 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                {formStatus === 'sending' ? 'Sending...' : 'Send Message'}
               </button>
-            </form>
 
-              {/* Envelope overlay */}
-              <div ref={envelopeRef} className="envelope">
-                {/* Envelope body */}
-                <div className="envelope-body"></div>
-
-                {/* Envelope flap */}
-                <div ref={envelopeFlapRef} className="envelope-flap"></div>
-
-                {/* Address lines */}
-                <div className="envelope-address">
-                  <div className="envelope-line" style={{ width: '150px' }}></div>
-                  <div className="envelope-line" style={{ width: '120px' }}></div>
-                  <div className="envelope-line" style={{ width: '100px' }}></div>
+              {formStatus === 'success' && (
+                <div className="text-center text-green-400 font-medium">
+                  ✓ Message sent successfully!
                 </div>
+              )}
+            </form>
+          </div>
 
-                {/* Stamp */}
-                <div className="envelope-stamp">✉️</div>
+          {/* Contact Info Cards */}
+          <div className="grid md:grid-cols-3 gap-6 mt-16">
+            <div id="contactInfo1" className="flex flex-col items-center text-center gap-4 opacity-0 transform translate-x-10 p-6 bg-stone-900/30 rounded-xl border border-stone-800">
+              <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-amber-500/20 to-orange-600/20 flex items-center justify-center">
+                <i className="fas fa-map-marker-alt text-2xl text-amber-500"></i>
+              </div>
+              <div>
+                <h3 className="font-semibold text-lg mb-1">Visit Us</h3>
+                <p className="text-stone-400 text-sm">Bon Air, Richmond, VA</p>
               </div>
             </div>
 
-            {/* Success message */}
-            <div
-              ref={successMessageRef}
-              className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center opacity-0 pointer-events-none z-50"
-            >
-              <div className="text-6xl text-amber-500 mb-4">✓</div>
-              <h3 className="text-3xl font-bold text-amber-500 mb-2">Message Sent!</h3>
-              <p className="text-stone-400">Thanks for reaching out!</p>
+            <div id="contactInfo2" className="flex flex-col items-center text-center gap-4 opacity-0 transform translate-x-10 p-6 bg-stone-900/30 rounded-xl border border-stone-800">
+              <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-pink-500/20 to-red-600/20 flex items-center justify-center">
+                <i className="fas fa-phone text-2xl text-pink-500"></i>
+              </div>
+              <div>
+                <h3 className="font-semibold text-lg mb-1">Call Us</h3>
+                <p className="text-stone-400 text-sm">(804) 555-BOOM</p>
+              </div>
+            </div>
+
+            <div id="contactInfo3" className="flex flex-col items-center text-center gap-4 opacity-0 transform translate-x-10 p-6 bg-stone-900/30 rounded-xl border border-stone-800">
+              <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-cyan-500/20 to-blue-600/20 flex items-center justify-center">
+                <i className="fas fa-envelope text-2xl text-cyan-500"></i>
+              </div>
+              <div>
+                <h3 className="font-semibold text-lg mb-1">Email Us</h3>
+                <p className="text-stone-400 text-sm">hello@bonairmedia.com</p>
+              </div>
             </div>
           </div>
 
-          {/* Map & Contact Info - Two Column Layout */}
-          <div className="grid lg:grid-cols-2 gap-12">
-            {/* Interactive Map */}
-            <div id="contactMap" className="opacity-0 transform translate-y-10">
-              <div className="relative h-full min-h-[500px] rounded-2xl overflow-hidden border-2 border-amber-500/20 shadow-2xl">
-                <iframe
-                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d99642.09823097894!2d-77.58448253125!3d37.52399395!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x89b111095799c9ed%3A0x9e1e8c8e8f6e8f6e!2sBon%20Air%2C%20VA!5e0!3m2!1sen!2sus!4v1234567890123"
-                  width="100%"
-                  height="100%"
-                  style={{ border: 0, minHeight: '500px' }}
-                  allowFullScreen
-                  loading="lazy"
-                  referrerPolicy="no-referrer-when-downgrade"
-                  className="absolute inset-0"
-                ></iframe>
-                <div className="absolute inset-0 pointer-events-none bg-gradient-to-t from-stone-950/30 to-transparent"></div>
-              </div>
-            </div>
-
-            {/* Contact Info Cards */}
-            <div className="space-y-8">
-              <div id="contactInfo1" className="flex items-start gap-4 opacity-0 transform translate-x-10">
-                <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-amber-500/20 to-orange-600/20 flex items-center justify-center flex-shrink-0">
-                  <i className="fas fa-map-marker-alt text-2xl text-amber-500"></i>
-                </div>
-                <div>
-                  <h3 className="font-semibold text-xl mb-2">Visit Us</h3>
-                  <p className="text-stone-400">Bon Air, Richmond, VA<br />Right in the heart of RVA</p>
-                </div>
-              </div>
-
-              <div id="contactInfo2" className="flex items-start gap-4 opacity-0 transform translate-x-10">
-                <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-pink-500/20 to-red-600/20 flex items-center justify-center flex-shrink-0">
-                  <i className="fas fa-phone text-2xl text-pink-500"></i>
-                </div>
-                <div>
-                  <h3 className="font-semibold text-xl mb-2">Call Us</h3>
-                  <p className="text-stone-400">(804) 555-BOOM<br />Mon-Fri, 9am-6pm EST</p>
-                </div>
-              </div>
-
-              <div id="contactInfo3" className="flex items-start gap-4 opacity-0 transform translate-x-10">
-                <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-cyan-500/20 to-blue-600/20 flex items-center justify-center flex-shrink-0">
-                  <i className="fas fa-envelope text-2xl text-cyan-500"></i>
-                </div>
-                <div>
-                  <h3 className="font-semibold text-xl mb-2">Email Us</h3>
-                  <p className="text-stone-400">hello@bonairmedia.com<br />We respond within 24 hours</p>
-                </div>
-              </div>
-
-              <div id="contactSocials" className="pt-8 opacity-0">
-                <h3 className="font-semibold text-xl mb-4">Follow Us</h3>
-                <div className="flex gap-4">
-                  <a href="#" className="social-3d w-12 h-12 rounded-xl bg-gradient-to-br from-stone-700/20 to-stone-900/20 flex items-center justify-center text-stone-300 hover:bg-stone-700 hover:text-white">
-                    <i className="fab fa-github text-xl"></i>
-                  </a>
-                  <a href="#" className="social-3d w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500/20 to-blue-700/20 flex items-center justify-center text-blue-400 hover:bg-blue-600 hover:text-white">
-                    <i className="fab fa-linkedin-in text-xl"></i>
-                  </a>
-                  <a href="#" className="social-3d w-12 h-12 rounded-xl bg-gradient-to-br from-indigo-500/20 to-indigo-700/20 flex items-center justify-center text-indigo-400 hover:bg-indigo-600 hover:text-white">
-                    <i className="fab fa-discord text-xl"></i>
-                  </a>
-                  <a href="#" className="social-3d w-12 h-12 rounded-xl bg-gradient-to-br from-blue-600/20 to-blue-800/20 flex items-center justify-center text-blue-500 hover:bg-blue-600 hover:text-white">
-                    <i className="fab fa-facebook-f text-xl"></i>
-                  </a>
-                  <a href="#" className="social-3d w-12 h-12 rounded-xl bg-gradient-to-br from-red-500/20 to-red-700/20 flex items-center justify-center text-red-500 hover:bg-red-600 hover:text-white">
-                    <i className="fab fa-youtube text-xl"></i>
-                  </a>
-                </div>
-              </div>
+          {/* Social Links */}
+          <div id="contactSocials" className="text-center mt-12 opacity-0">
+            <h3 className="font-semibold text-lg mb-4">Follow Us</h3>
+            <div className="flex gap-4 justify-center">
+              <a href="#" className="w-12 h-12 rounded-lg bg-gradient-to-br from-stone-700/20 to-stone-900/20 flex items-center justify-center text-stone-300 hover:bg-stone-700 hover:text-white transition-all">
+                <i className="fab fa-github text-xl"></i>
+              </a>
+              <a href="#" className="w-12 h-12 rounded-lg bg-gradient-to-br from-blue-500/20 to-blue-700/20 flex items-center justify-center text-blue-400 hover:bg-blue-600 hover:text-white transition-all">
+                <i className="fab fa-linkedin-in text-xl"></i>
+              </a>
+              <a href="#" className="w-12 h-12 rounded-lg bg-gradient-to-br from-indigo-500/20 to-indigo-700/20 flex items-center justify-center text-indigo-400 hover:bg-indigo-600 hover:text-white transition-all">
+                <i className="fab fa-discord text-xl"></i>
+              </a>
+              <a href="#" className="w-12 h-12 rounded-lg bg-gradient-to-br from-blue-600/20 to-blue-800/20 flex items-center justify-center text-blue-500 hover:bg-blue-600 hover:text-white transition-all">
+                <i className="fab fa-facebook-f text-xl"></i>
+              </a>
+              <a href="#" className="w-12 h-12 rounded-lg bg-gradient-to-br from-red-500/20 to-red-700/20 flex items-center justify-center text-red-500 hover:bg-red-600 hover:text-white transition-all">
+                <i className="fab fa-youtube text-xl"></i>
+              </a>
             </div>
           </div>
         </div>
