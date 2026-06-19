@@ -108,10 +108,9 @@ export default function Home() {
       .to('#heroButtons', { opacity:1, y:0, duration:0.8 }, '-=1.5')
       .to('#scrollIndicator', { opacity:1, duration:0.8 }, '-=0.5');
 
-    // Water tower
-    gsap.from('#waterTower svg', { y:100, scale:0.9, opacity:0, duration:2, ease:'power3.out', delay:0.2 });
-    gsap.to('#waterTower svg', { rotation:0.5, duration:6, repeat:-1, yoyo:true, ease:'sine.inOut', transformOrigin:'center bottom' });
-    gsap.to('#waterTower', { yPercent:-15, scale:1.05, ease:'none', scrollTrigger:{ trigger:'#hero', start:'top top', end:'bottom top', scrub:true }});
+    // Bertrim hero entrance
+    gsap.from('#bertrimHero .bertrim-float', { scale:0.5, opacity:0, duration:2.5, ease:'elastic.out(1,0.4)', delay:0.5 });
+    gsap.to('#bertrimHero', { yPercent:-15, scale:1.08, ease:'none', scrollTrigger:{ trigger:'#hero', start:'top top', end:'bottom top', scrub:true }});
 
     // Blobs
     gsap.to('.color-blob', { x:'random(-80,80)', y:'random(-80,80)', duration:'random(12,20)', repeat:-1, yoyo:true, ease:'sine.inOut', stagger:{ each:2, from:'random' }});
@@ -299,7 +298,7 @@ export default function Home() {
         <div className="absolute inset-0 bg-stone-950/60 z-[1]" />
         <canvas ref={canvasRef} id="threejsCanvas" className="z-[2]" />
 
-        {/* Water Tower */}
+        {/* Astronaut Bertrim — floating mascot */}
         <div id="heroBg" className="parallax-bg absolute inset-0 z-[3]">
           <div id="starsLayer" className="absolute inset-0 opacity-60">
             <div className="absolute w-1.5 h-1.5 bg-amber-400 rounded-full" style={{top:'8%',left:'12%'}} />
@@ -308,33 +307,10 @@ export default function Home() {
             <div className="absolute w-2.5 h-2.5 bg-purple-500 rounded-full opacity-60" style={{top:'12%',left:'65%'}} />
             <div className="absolute w-1.5 h-1.5 bg-green-400 rounded-full" style={{top:'20%',left:'92%'}} />
           </div>
-          <div id="waterTower" className="absolute inset-0 flex items-end justify-center pb-0">
-            <svg viewBox="0 0 600 900" className="w-full max-w-4xl h-auto opacity-20" preserveAspectRatio="xMidYMax meet" style={{transform:'translateY(15%)'}}>
-              <defs>
-                <linearGradient id="tankGradient" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" style={{stopColor:'#92400e'}}/><stop offset="50%" style={{stopColor:'#f59e0b'}}/><stop offset="100%" style={{stopColor:'#92400e'}}/></linearGradient>
-                <linearGradient id="legGradient" x1="0%" y1="100%" x2="0%" y2="0%"><stop offset="0%" style={{stopColor:'#78350f'}}/><stop offset="100%" style={{stopColor:'#d97706'}}/></linearGradient>
-                <filter id="glow"><feGaussianBlur stdDeviation="4" result="coloredBlur"/><feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
-              </defs>
-              <path d="M80 900 L165 420 L175 420 L95 900 Z" fill="url(#legGradient)" opacity="0.9"/>
-              <path d="M520 900 L435 420 L425 420 L505 900 Z" fill="url(#legGradient)" opacity="0.9"/>
-              <path d="M180 900 L230 440 L250 440 L205 900 Z" fill="url(#legGradient)"/>
-              <path d="M420 900 L370 440 L350 440 L395 900 Z" fill="url(#legGradient)"/>
-              <line x1="90" y1="800" x2="500" y2="650" stroke="#f59e0b" strokeWidth="4" opacity="0.7"/>
-              <line x1="500" y1="800" x2="90" y2="650" stroke="#f59e0b" strokeWidth="4" opacity="0.7"/>
-              <line x1="120" y1="620" x2="480" y2="500" stroke="#f59e0b" strokeWidth="4" opacity="0.75"/>
-              <line x1="480" y1="620" x2="120" y2="500" stroke="#f59e0b" strokeWidth="4" opacity="0.75"/>
-              <polygon points="130,400 470,400 450,415 150,415" fill="none" stroke="url(#tankGradient)" strokeWidth="4"/>
-              <ellipse cx="300" cy="395" rx="145" ry="35" fill="none" stroke="url(#tankGradient)" strokeWidth="5" filter="url(#glow)"/>
-              <path d="M155 395 C155 395 140 300 145 250 Q150 180 300 140 Q450 180 455 250 C460 300 445 395 445 395" fill="none" stroke="url(#tankGradient)" strokeWidth="5" filter="url(#glow)"/>
-              <ellipse cx="300" cy="350" rx="135" ry="30" fill="none" stroke="#f59e0b" strokeWidth="3" opacity="0.6"/>
-              <path id="textPath" d="M175 320 Q300 280 425 320" fill="none"/>
-              <text fontFamily="Bebas Neue, sans-serif" fontSize="42" fill="#f59e0b" letterSpacing="12" filter="url(#glow)"><textPath href="#textPath" startOffset="50%" textAnchor="middle">BON AIR</textPath></text>
-              <path d="M175 235 Q175 170 300 130 Q425 170 425 235" fill="none" stroke="url(#tankGradient)" strokeWidth="4" filter="url(#glow)"/>
-              <ellipse cx="300" cy="140" rx="55" ry="18" fill="none" stroke="#f59e0b" strokeWidth="4"/>
-              <line x1="300" y1="122" x2="300" y2="50" stroke="url(#tankGradient)" strokeWidth="5" strokeLinecap="round" filter="url(#glow)"/>
-              <circle cx="300" cy="42" r="10" fill="none" stroke="#f59e0b" strokeWidth="3" filter="url(#glow)"/>
-              <circle cx="300" cy="5" r="5" fill="#fbbf24" filter="url(#glow)"/>
-            </svg>
+          <div id="bertrimHero" className="absolute inset-0 flex items-center justify-center pointer-events-none">
+            <div className="relative w-[340px] h-[340px] md:w-[480px] md:h-[480px] lg:w-[560px] lg:h-[560px] opacity-25 bertrim-float">
+              <Image src="/bertrim.webp" alt="Bertrim — Bon Air Media Mascot" fill className="object-contain drop-shadow-[0_0_60px_rgba(245,158,11,0.3)]" sizes="560px" priority />
+            </div>
           </div>
         </div>
 
