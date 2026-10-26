@@ -42,10 +42,10 @@ Tasks:
      Keep the lines in the same flat style as the reference grid: thin, clean strokes and no shading.
    Add these as optional fields in avatarConfig, with defaults, so existing saved avatars keep rendering. Update the Convex validators to match.
 
-3. Two choices from the last session need my decision. Don't change them; ask me at the end:
-   a) Who can edit a care recipient's avatar: any care-team member, or only the owner/admins?
-   b) What happens when a Plus/Professional subscription is cancelled: lose the builder right away, or keep the saved custom avatar visible and only lock editing? (My leaning is to keep it visible.)
-   Give me your recommendation for each.
+3. I've made two decisions. Implement both, enforce them in the Convex mutations, and add tests:
+   a) Each person edits only their own avatar. A provider or family member can change only their own profile avatar, and nobody can change someone else's.
+   b) When a Plus or Professional subscription is cancelled or expires, the saved custom avatar stays visible everywhere and keeps rendering. Only the builder is locked. Saving a new custom config needs an active or trialing entitlement, but uploading a photo and picking an emoji stay free.
+   One case is still open, so ask me about it: care recipients may not have their own login. Tell me how the code currently decides who can edit a care recipient's avatar, and recommend an option, such as the care circle owner/admins or the person who added the recipient. Don't change that behavior until I answer.
 
 4. Look at the three Higgsfield concept sheets embedded on the spec page. Compare the builder's output to them and list the visual gaps that matter.
 
@@ -67,6 +67,6 @@ Return:
 - test, lint and type-check results
 - the Notion link
 - the GrokBot delivery status
-- the two questions from task 3, each with your recommendation
+- the open question from task 3 about care-recipient avatars, with your recommendation
 - anything still blocked
 ```
